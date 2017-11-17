@@ -81,3 +81,26 @@ def matrix((rows, columns), input_list=None, fill_value=None, distribution=None)
     if distribution != None:
         matrix = mnDoubleMatrix.CreateRandom(rows, columns, distribution)
         return matrix
+
+
+def list_transpose_stack(input_list):
+    """
+    Transpose row-major python list of lists into column-major for MathNet matrix
+
+    a = [1, 2, 3, 4]
+    b = [a, a[::-1]]
+
+    c = mnw.matrix((2, 4), input_list=mnw.list_transpose_stack(b))
+
+    print b, c
+    [[1, 2, 3, 4], [4, 3, 2, 1]]
+    DenseMatrix 2x4-Double
+    1 2 3 4
+    4 3 2 1
+    """
+
+    out = map(list, zip(*input_list))
+
+    out = itertools.chain(*out)
+
+    return [i for i in out]
