@@ -32,11 +32,35 @@ import MathNet.Numerics as MN
 from pyrevit.coreutils.mathnet import MathNet
 MN = MathNet.Numerics
 from System import Array
-
+import itertools
 
 ### .NET to Python aliases
 mnDoubleVector = MN.LinearAlgebra.Double.Vector.Build.DenseOfArray
 mnDoubleMatrix = MN.LinearAlgebra.Double.DenseMatrix
+
+
+### Transformation functions
+def list_transpose_stack(input_list):
+    """
+    Transpose row-major python list of lists into column-major for MathNet matrix
+
+    a = [1, 2, 3, 4]
+    b = [a, a[::-1]]
+
+    c = mnw.matrix((2, 4), input_list=mnw.list_transpose_stack(b))
+
+    print b, c
+    [[1, 2, 3, 4], [4, 3, 2, 1]]
+    DenseMatrix 2x4-Double
+    1 2 3 4
+    4 3 2 1
+    """
+
+    out = map(list, zip(*input_list))
+
+    out = itertools.chain(*out)
+
+    return [i for i in out]
 
 
 ### Wrapper functions TODO: just inherit from the .NET class
@@ -59,7 +83,7 @@ def vector(input_list):
     return mnDoubleVector(arr)
 
 
-def matrix((rows, columns), input_list=None, fill_value=None, distribution=None):
+def matrix((rows, columns), input_list=None, transpose=False, fill_value=None, distribution=None):
     """
     Turn a Python List into a matrix of Doubles (Column-major order)
 
@@ -74,6 +98,8 @@ def matrix((rows, columns), input_list=None, fill_value=None, distribution=None)
     """
 
     if input_list != None:
+        if transpose:
+            input_list = list_transpose_stack(input_list)
         assert(len(input_list) == rows * columns, "Matrix rank must equal input list length")
         arr = Array[float](input_list)
         matrix = mnDoubleMatrix(rows, columns, arr)
@@ -86,26 +112,3 @@ def matrix((rows, columns), input_list=None, fill_value=None, distribution=None)
     if distribution != None:
         matrix = mnDoubleMatrix.CreateRandom(rows, columns, distribution)
         return matrix
-
-
-def list_transpose_stack(input_list):
-    """
-    Transpose row-major python list of lists into column-major for MathNet matrix
-
-    a = [1, 2, 3, 4]
-    b = [a, a[::-1]]
-
-    c = mnw.matrix((2, 4), input_list=mnw.list_transpose_stack(b))
-
-    print b, c
-    [[1, 2, 3, 4], [4, 3, 2, 1]]
-    DenseMatrix 2x4-Double
-    1 2 3 4
-    4 3 2 1
-    """
-
-    out = map(list, zip(*input_list))
-
-    out = itertools.chain(*out)
-
-    return [i for i in out]
