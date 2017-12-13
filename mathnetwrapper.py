@@ -20,12 +20,17 @@ More to come...
 
 """
 
-from System import Environment
+
+"""
 from clr import AddReferenceToFileAndPath as addref
 mathnet_path = "PATH TO MATHNET FOLDER"
 path = "{}\\MathNet.Numerics\\lib\\net40\\MathNet.Numerics.dll".format(mathnet_path)
 addref(path)
 import MathNet.Numerics as MN
+"""
+### This is primarily for use with pyRevit. If using as a standard Python lib, uncomment above, edit mathnet_path, comment out below
+from pyrevit.coreutils.mathnet import MathNet
+MN = MathNet.Numerics
 from System import Array
 
 
